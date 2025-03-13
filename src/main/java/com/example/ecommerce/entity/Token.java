@@ -4,14 +4,21 @@ import com.example.ecommerce.enums.TokenType;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "tokens", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"accessToken"}),
+        @UniqueConstraint(columnNames = {"refreshToken"})
+})
 public class Token {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(unique = true, nullable = false)
-    private String token;
+    @Column(unique = true, nullable = false, length = 512)
+    private String accessToken;
+
+    @Column(unique = true, nullable = false, length = 512)
+    private String refreshToken;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -29,8 +36,9 @@ public class Token {
 
     protected Token() {}
 
-    public Token(String token, TokenType tokenType, boolean revoked, boolean expired, User user) {
-        this.token = token;
+    public Token(String accessToken, String refreshToken, TokenType tokenType, boolean revoked, boolean expired, User user) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.tokenType = tokenType;
         this.revoked = revoked;
         this.expired = expired;
@@ -41,8 +49,12 @@ public class Token {
         return id;
     }
 
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
+    }
+
+    public String getRefreshToken() {
+        return refreshToken;
     }
 
     public TokenType getTokenType() {
@@ -65,8 +77,12 @@ public class Token {
         this.id = id;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public void setTokenType(TokenType tokenType) {
@@ -87,13 +103,10 @@ public class Token {
 
     @Override
     public String toString() {
-        return "Token{" +
-                "id=" + id +
-                ", token='" + token + '\'' +
+        return "Token{id=" + id +
                 ", tokenType=" + tokenType +
                 ", revoked=" + revoked +
                 ", expired=" + expired +
-                ", user=" + (user != null ? user.getId() : "null") +
-                '}';
+                ", userId=" + (user != null ? user.getId() : "null") + "}";
     }
 }

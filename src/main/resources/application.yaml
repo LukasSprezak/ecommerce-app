@@ -10,6 +10,18 @@ spring:
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  mail:
+    host: smtp.mailtrap.io
+    port: 2525
+    username: "username"
+    password: "password"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
   jpa:
     database: mysql
     show-sql: true
