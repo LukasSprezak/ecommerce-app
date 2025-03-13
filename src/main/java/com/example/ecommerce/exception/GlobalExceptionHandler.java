@@ -1,5 +1,7 @@
 package com.example.ecommerce.exception;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -17,25 +19,29 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException ex) {
-        Map<String, String> error = new HashMap<>();
-        error.put("error", ex.getReason());
+    private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
-        return ResponseEntity.status(ex.getStatusCode()).body(error);
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException exception) {
+        Map<String, String> error = new HashMap<>();
+        error.put("error", exception.getReason());
+
+        return ResponseEntity.status(exception.getStatusCode()).body(error);
     }
 
     @ExceptionHandler({BadCredentialsException.class, UsernameNotFoundException.class})
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
-    public Map<String, String> handleAuthenticationException(Exception ex) {
+    public Map<String, String> handleAuthenticationException(Exception exception) {
+        logger.warn("Authentication failed: {}", exception.getMessage());
+
         return Map.of("error", "Invalid username or password");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public Map<String, String> handleValidationException(MethodArgumentNotValidException ex) {
+    public Map<String, String> handleValidationException(MethodArgumentNotValidException exception) {
         Map<String, String> errors = new HashMap<>();
-        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+        for (FieldError error : exception.getBindingResult().getFieldErrors()) {
             errors.put(error.getField(), error.getDefaultMessage());
         }
 
@@ -44,7 +50,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public Map<String, String> handleGeneralException(Exception ex) {
-        return Map.of("error", "Unexpected error: " + ex.getMessage());
+    public Map<String, String> handleGeneralException(Exception exception) {
+        return Map.of("error", "Unexpected error: " + exception.getMessage());
     }
 }
