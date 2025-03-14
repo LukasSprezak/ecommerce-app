@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,26 +27,22 @@ public class GlobalExceptionHandler {
         logger.warn("Handled ResponseStatusException: {} - {}", exception.getStatusCode(), exception.getReason());
 
         String reason = Optional.ofNullable(exception.getReason()).orElse("Unexpected error");
-
         return ResponseEntity
                 .status(exception.getStatusCode())
                 .body(Map.of("error", reason));
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Map<String, String>> handleGeneralException(Exception exception) {
-        logger.error("Unhandled exception occurred: {}", exception.getMessage(), exception);
-
-        return ResponseEntity
-                .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Map.of("error", "Unexpected internal server error"));
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public Map<String, String> handleGeneralException(Exception exception) {
+        logger.error("Unexpected error occurred", exception);
+        return Map.of("error", "Unexpected error: " + exception.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Map<String, String> handleBadCredentialsException(BadCredentialsException exception) {
         logger.warn("Authentication failed: {}", exception.getMessage());
-
         return Map.of("error", "Invalid username or password");
     }
 
@@ -55,14 +50,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public Map<String, String> handleUsernameNotFoundException(UsernameNotFoundException exception) {
         logger.warn("User not found: {}", exception.getMessage());
-
         return Map.of("error", "User not found");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> handleValidationException(MethodArgumentNotValidException exception) {
-        Map<String, String> errors = exception.getBindingResult().getFieldErrors().stream()
+        Map<String, String> errors = exception.getBindingResult().getFieldErrors()
+                .stream()
                 .collect(Collectors.toMap(FieldError::getField, error -> Optional.ofNullable(error.getDefaultMessage())
                         .orElse("Invalid value"), (msg1, msg2) -> msg1));
 

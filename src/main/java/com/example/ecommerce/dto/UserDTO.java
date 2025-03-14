@@ -1,5 +1,9 @@
 package com.example.ecommerce.dto;
 
+import com.example.ecommerce.entity.DeliveryAddress;
+import com.example.ecommerce.entity.Discount;
+import com.example.ecommerce.entity.Order;
+import com.example.ecommerce.entity.User;
 import com.example.ecommerce.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
@@ -18,4 +22,18 @@ public record UserDTO(
         @JsonView(Views.Extended.class) List<Long> addressIds,
         @JsonView(Views.Extended.class) List<Long> orderIds,
         @JsonView(Views.Extended.class) List<Long> discountIds
-) {}
+) {
+    public static UserDTO fromEntity(User user) {
+        return new UserDTO(
+                user.getId(),
+                user.getUuid(),
+                PersonalDetailsDTO.fromEntity(user.getPersonal()),
+                user.getEmail(),
+                null,
+                user.getRole(),
+                user.getAddresses().stream().map(DeliveryAddress::getId).toList(),
+                user.getOrders().stream().map(Order::getId).toList(),
+                user.getDiscount().stream().map(Discount::getId).toList()
+        );
+    }
+}

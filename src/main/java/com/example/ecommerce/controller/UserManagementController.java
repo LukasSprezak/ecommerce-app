@@ -6,11 +6,11 @@ import com.example.ecommerce.service.UserManagementService;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
@@ -29,11 +29,6 @@ public class UserManagementController {
     @JsonView(Views.Public.class)
     public ResponseEntity<List<UserDTO>> getAll() {
         List<UserDTO> users = userManagementService.getAll();
-
-        if (users.isEmpty()) {
-            return ResponseEntity.noContent().build();
-        }
-
         return ResponseEntity.ok(users);
     }
 
@@ -46,21 +41,18 @@ public class UserManagementController {
     @PostMapping
     public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO) {
         UserDTO createdUser = userManagementService.create(userDTO);
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
+        return ResponseEntity.created(URI.create("/api/users/" + createdUser.uuid())).body(createdUser);
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<Void> put(@PathVariable UUID uuid, @RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<Void> updateUser(@PathVariable UUID uuid, @RequestBody @Valid UserDTO userDTO) {
         userManagementService.put(uuid, userDTO);
-
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<Void> delete(@PathVariable UUID uuid) {
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID uuid) {
         userManagementService.delete(uuid);
-
         return ResponseEntity.noContent().build();
     }
 }
