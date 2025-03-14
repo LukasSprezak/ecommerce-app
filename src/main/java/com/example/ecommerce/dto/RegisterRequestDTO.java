@@ -5,6 +5,7 @@ import com.example.ecommerce.enums.Role;
 public record RegisterRequestDTO(
         String firstname,
         String lastname,
+        String phoneNumber,
         String email,
         String password,
         Role role

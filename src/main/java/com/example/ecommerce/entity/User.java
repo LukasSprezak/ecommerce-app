@@ -1,12 +1,17 @@
 package com.example.ecommerce.entity;
 
+import com.example.ecommerce.converter.UUIDConverter;
 import com.example.ecommerce.enums.Role;
+import com.example.ecommerce.enums.UserStatus;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "_user")
@@ -14,13 +19,23 @@ public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+    private Long id;
 
-    @Column(nullable = false)
-    private String firstname;
+    @Column(unique = true, nullable = false, updatable = false)
+    private UUID uuid = UUID.randomUUID();
 
-    @Column(nullable = false)
-    private String lastname;
+    @NotNull
+    @Embedded
+    private PersonalDetails personal;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<DeliveryAddress> addresses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Order> orders = new ArrayList<>();
+
+    @ManyToMany(mappedBy = "user")
+    private List<Discount> discount = new ArrayList<>();
 
     @Column(unique = true, length = 100, nullable = false)
     private String email;
@@ -30,31 +45,56 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    private Role role = Role.USER;
 
-    @OneToMany(mappedBy = "user")
-    private List<Token> tokens;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private UserStatus status = UserStatus.ACTIVE;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Token> tokens = new ArrayList<>();
 
     protected User() {}
 
-    public User(String firstname, String lastname, String email, String password, Role role) {
-        this.firstname = firstname;
-        this.lastname = lastname;
+    public User(PersonalDetails personal, String email, String password, Role role) {
+        this.personal = personal;
         this.email = email;
         this.password = password;
         this.role = role;
     }
 
-    public Integer getId() {
+    public static User of(UUID uuid, PersonalDetails personal, String email, String password) {
+        User user = new User();
+        user.uuid = uuid;
+        user.personal = personal;
+        user.email = email;
+        user.password = password;
+
+        return user;
+    }
+
+    public Long getId() {
         return id;
     }
 
-    public String getFirstname() {
-        return firstname;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public String getLastname() {
-        return lastname;
+    public PersonalDetails getPersonal() {
+        return personal;
+    }
+
+    public List<DeliveryAddress> getAddresses() {
+        return addresses;
+    }
+
+    public List<Discount> getDiscount() {
+        return discount;
+    }
+
+    public List<Order> getOrders() {
+        return orders;
     }
 
     public String getEmail() {
@@ -65,20 +105,36 @@ public class User implements UserDetails {
         return role;
     }
 
+    public UserStatus getStatus() {
+        return status;
+    }
+
     public List<Token> getTokens() {
         return tokens;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
+    public void setPersonal(PersonalDetails personal) {
+        this.personal = personal;
+    }
+
+    public void setAddresses(List<DeliveryAddress> addresses) {
+        this.addresses = addresses;
+    }
+
+    public void setDiscount(List<Discount> discount) {
+        this.discount = discount;
+    }
+
+    public void setOrders(List<Order> orders) {
+        this.orders = orders;
     }
 
     public void setEmail(String email) {
@@ -91,6 +147,10 @@ public class User implements UserDetails {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void setStatus(UserStatus status) {
+        this.status = status;
     }
 
     public void setTokens(List<Token> tokens) {

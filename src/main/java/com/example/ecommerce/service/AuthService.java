@@ -3,6 +3,7 @@ package com.example.ecommerce.service;
 import com.example.ecommerce.dto.AuthRequestDTO;
 import com.example.ecommerce.dto.AuthResponseDTO;
 import com.example.ecommerce.dto.RegisterRequestDTO;
+import com.example.ecommerce.entity.PersonalDetails;
 import com.example.ecommerce.entity.Token;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.enums.TokenType;
@@ -44,9 +45,15 @@ public class AuthService {
     }
 
     public AuthResponseDTO register(RegisterRequestDTO request) {
-        User user = new User(
+
+        PersonalDetails personalDetails = new PersonalDetails(
                 request.firstname(),
                 request.lastname(),
+                request.phoneNumber()
+        );
+
+        User user = new User(
+                personalDetails,
                 request.email(),
                 passwordEncoder.encode(request.password()),
                 request.role()

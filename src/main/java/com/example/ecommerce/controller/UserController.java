@@ -2,9 +2,10 @@ package com.example.ecommerce.controller;
 
 import com.example.ecommerce.dto.ChangePasswordRequestDTO;
 import com.example.ecommerce.dto.ResetPasswordRequestDTO;
-import com.example.ecommerce.service.UserService;
+import com.example.ecommerce.service.UserSecurityService;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -13,13 +14,14 @@ import java.security.Principal;
 @RequestMapping(path = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UserController {
 
-    private final UserService userService;
+    private final UserSecurityService userService;
 
-    public UserController(UserService userService) {
+    public UserController(UserSecurityService userService) {
         this.userService = userService;
     }
 
     @PostMapping("/reset-password-request")
+    @Transactional
     public ResponseEntity<Void> requestPasswordReset(@RequestParam String email) {
         userService.requestPasswordReset(email);
 
@@ -27,6 +29,7 @@ public class UserController {
     }
 
     @PostMapping("/reset-password")
+    @Transactional
     public ResponseEntity<Void> resetPassword(@RequestBody ResetPasswordRequestDTO request) {
         userService.resetPassword(request);
 
@@ -34,6 +37,7 @@ public class UserController {
     }
 
     @PostMapping("/change-password")
+    @Transactional
     public ResponseEntity<Void> changePassword(@RequestBody ChangePasswordRequestDTO request, Principal principal) {
         userService.changePassword(request, principal);
 

@@ -1,5 +1,6 @@
 package com.example.ecommerce.component;
 
+import com.example.ecommerce.entity.PersonalDetails;
 import com.example.ecommerce.entity.User;
 import com.example.ecommerce.enums.Role;
 import com.example.ecommerce.repository.UserRepository;
@@ -39,9 +40,14 @@ public class CreateAdmin {
         }
 
         try {
-            User adminUser = new User(
+            PersonalDetails personalDetails = new PersonalDetails(
                     "Admin",
-                    "User",
+                    "Smith",
+                    "123456789"
+            );
+
+            User adminUser = new User(
+                    personalDetails,
                     ADMIN_EMAIL,
                     passwordEncoder.encode(DEFAULT_PASSWORD),
                     Role.ADMIN
@@ -49,8 +55,8 @@ public class CreateAdmin {
 
             userRepository.save(adminUser);
             logger.info("ADMIN user created successfully. Email: {}", ADMIN_EMAIL);
-        } catch (Exception e) {
-            logger.error("Failed to create ADMIN user", e);
+        } catch (Exception exception) {
+            logger.error("Failed to create ADMIN user", exception);
         }
     }
 }
