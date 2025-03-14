@@ -1,5 +1,6 @@
 package com.example.ecommerce.exception;
 
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -21,6 +22,15 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     private static final Logger logger = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<Map<String, String>> handleRateLimitExceeded(RequestNotPermitted exception) {
+        logger.warn("Rate limit exceeded: {}", exception.getMessage());
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(Map.of("error", "Too many requests. Try again later."));
+    }
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<Map<String, String>> handleResponseStatusException(ResponseStatusException exception) {

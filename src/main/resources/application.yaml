@@ -10,6 +10,17 @@ spring:
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
 
+  jpa:
+    database: mysql
+    show-sql: true
+    hibernate:
+      ddl-auto: create-drop
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
   mail:
     host: smtp.mailtrap.io
     port: 2525
@@ -22,13 +33,17 @@ spring:
           starttls:
             enable: true
 
-  jpa:
-    database: mysql
-    show-sql: true
-    hibernate:
-      ddl-auto: create-drop
-      naming:
-        physical-strategy: org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+application:
+  security:
+    jwt:
+      secret-key: yourtoken
+      expiration: 86400000
+      refresh-token:
+        expiration: 604800000
+
+resilience4j.ratelimiter:
+  instances:
+    apiLimiter:
+      limitForPeriod: 5
+      limitRefreshPeriod: 60s
+      timeoutDuration: 0s
