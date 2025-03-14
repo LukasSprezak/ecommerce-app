@@ -24,6 +24,10 @@ public class PersonalDetails {
         this.phoneNumber = phoneNumber;
     }
 
+    public static PersonalDetails empty() {
+        return new PersonalDetails();
+    }
+
     public String getFirstname() {
         return firstname;
     }
@@ -35,17 +39,5 @@ public class PersonalDetails {
     @Nullable
     public String getPhoneNumber() {
         return phoneNumber;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public void setPhoneNumber(@Nullable String phoneNumber) {
-        this.phoneNumber = phoneNumber;
     }
 }

@@ -39,6 +39,16 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Vat vat;
 
+    protected Product() {}
+
+    public Product(UUID uuid, String name, BigDecimal nettoPrice, BigDecimal bruttoPrice, Vat vat) {
+        this.uuid = uuid;
+        this.name = name;
+        this.nettoPrice = nettoPrice;
+        this.bruttoPrice = bruttoPrice;
+        this.vat = vat;
+    }
+
     public Long getId() {
         return id;
     }
@@ -63,27 +73,10 @@ public class Product {
         return vat;
     }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setUuid(UUID uuid) {
-        this.uuid = uuid;
-    }
-
-    public void setName(String name) {
+    public void update(String name, BigDecimal nettoPrice, BigDecimal bruttoPrice, Vat vat) {
         this.name = name;
-    }
-
-    public void setNettoPrice(BigDecimal nettoPrice) {
         this.nettoPrice = nettoPrice;
-    }
-
-    public void setBruttoPrice(BigDecimal bruttoPrice) {
         this.bruttoPrice = bruttoPrice;
-    }
-
-    public void setVat(Vat vat) {
         this.vat = vat;
     }
 }

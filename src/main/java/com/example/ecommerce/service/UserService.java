@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface UserService {
     List<UserDTO> getAll();
     UserDTO create(UserDTO userDTO);
-    UserDTO put(UUID uuid, UserDTO userDTO);
+    void put(UUID uuid, UserDTO userDTO);
     void delete(UUID uuid);
     UserDTO getByUuid(UUID uuid);
 }

@@ -63,16 +63,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    public static User of(UUID uuid, PersonalDetails personal, String email, String password) {
-        User user = new User();
-        user.uuid = uuid;
-        user.personal = personal;
-        user.email = email;
-        user.password = password;
-
-        return user;
-    }
-
     public Long getId() {
         return id;
     }

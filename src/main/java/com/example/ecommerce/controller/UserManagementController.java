@@ -5,7 +5,6 @@ import com.example.ecommerce.dto.Views;
 import com.example.ecommerce.service.UserManagementService;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,6 @@ public class UserManagementController {
 
     private final UserManagementService userManagementService;
 
-    @Autowired
     public UserManagementController(UserManagementService userManagementService) {
         this.userManagementService = userManagementService;
     }
@@ -39,19 +37,21 @@ public class UserManagementController {
     }
 
     @PostMapping
-    public ResponseEntity<UserDTO> createUser(@RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<UserDTO> create(@RequestBody @Valid UserDTO userDTO) {
         UserDTO createdUser = userManagementService.create(userDTO);
-        return ResponseEntity.created(URI.create("/api/users/" + createdUser.uuid())).body(createdUser);
+
+        URI location = URI.create(String.format("/api/users/%s", createdUser.uuid()));
+        return ResponseEntity.created(location).body(createdUser);
     }
 
     @PutMapping("/{uuid}")
-    public ResponseEntity<Void> updateUser(@PathVariable UUID uuid, @RequestBody @Valid UserDTO userDTO) {
+    public ResponseEntity<Void> update(@PathVariable UUID uuid, @RequestBody @Valid UserDTO userDTO) {
         userManagementService.put(uuid, userDTO);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{uuid}")
-    public ResponseEntity<Void> deleteUser(@PathVariable UUID uuid) {
+    public ResponseEntity<Void> delete(@PathVariable UUID uuid) {
         userManagementService.delete(uuid);
         return ResponseEntity.noContent().build();
     }

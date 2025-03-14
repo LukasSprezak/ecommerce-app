@@ -1,15 +1,13 @@
 package com.example.ecommerce.dto;
 
-import com.example.ecommerce.entity.DeliveryAddress;
-import com.example.ecommerce.entity.Discount;
-import com.example.ecommerce.entity.Order;
-import com.example.ecommerce.entity.User;
+import com.example.ecommerce.entity.*;
 import com.example.ecommerce.enums.Role;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
 import jakarta.validation.constraints.NotBlank;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public record UserDTO(
@@ -34,6 +32,17 @@ public record UserDTO(
                 user.getAddresses().stream().map(DeliveryAddress::getId).toList(),
                 user.getOrders().stream().map(Order::getId).toList(),
                 user.getDiscount().stream().map(Discount::getId).toList()
+        );
+    }
+
+    public User toEntity() {
+        return new User(
+                Optional.ofNullable(personal)
+                        .map(PersonalDetailsDTO::toEntity)
+                        .orElseGet(PersonalDetails::empty),
+                email,
+                password,
+                Optional.ofNullable(role).orElse(Role.USER)
         );
     }
 }

@@ -42,26 +42,22 @@ public class UserManagementService implements UserService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "User with this UUID already exists");
         }
 
-        User user = User.of(
-                UUID.randomUUID(),
-                userDTO.personal().toEntity(),
-                userDTO.email(),
-                passwordEncoder.encode(userDTO.password())
-        );
+        User user = userDTO.toEntity();
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         return UserDTO.fromEntity(userRepository.save(user));
     }
 
     @Override
     @Transactional
-    public UserDTO put(UUID uuid, UserDTO userDTO) {
+    public void put(UUID uuid, UserDTO userDTO) {
         User user = userRepository.findByUuid(uuid)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
         user.setPersonal(userDTO.personal().toEntity());
-        return UserDTO.fromEntity(userRepository.save(user));
+        UserDTO.fromEntity(userRepository.save(user));
     }
-    
+
     @Override
     @Transactional
     public void delete(UUID uuid) {
